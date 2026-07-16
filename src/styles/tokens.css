@@ -1,0 +1,173 @@
+/*
+ * ============================================================================
+ * Datum — Design Tokens
+ * ============================================================================
+ * The single, canonical token set. Transcribed verbatim from the Design Bible
+ * (Phase 05 §15) — design and code reference these names, never raw values.
+ * Change a token here and the whole system moves in lockstep.
+ *
+ * This file is the ONLY place a literal value is authored (Sprint 01 §04).
+ * A raw hex, px or ms outside this layer is a defect.
+ *
+ * Theme strategy (Blueprint §06): light is the default, canonical mode. The
+ * dark companion is a value remap applied on [data-theme="dark"] — the same
+ * token names resolve to different values; no component branches on a theme.
+ * ============================================================================
+ */
+
+:root {
+  /* --- Color · neutral spine ------------------------------------------- */
+  --paper: #faf8f4; /* base canvas — warm, never white  */
+  --surface: #f1eee7; /* raised cards, panels             */
+  --sunken: #eae6dd; /* wells, insets, tracks            */
+  --hairline: #ded9ce; /* borders, datum rules             */
+
+  /* --- Color · ink (text hierarchy) ------------------------------------ */
+  --ink: #17150f; /* primary text  ≈15:1              */
+  --graphite: #55514a; /* body text     >7:1              */
+  --mute: #8a857a; /* labels        >4.5:1            */
+
+  /* --- Color · signal & semantic (functional only) --------------------- */
+  --signal: #1b3ad6; /* links · focus · primary action  */
+  --signal-tint: #e7eafc; /* selection · active background   */
+  --success: #1f7a54; /* confirmed · passing             */
+  --warning: #b47318; /* caution · pending               */
+  --danger: #b23a2e; /* error · destructive             */
+  --info: #2c6e8f; /* neutral notice                  */
+  --neutral-tag: #edeae3; /* default tag / chip background    */
+
+  /* --- Typography · families ------------------------------------------- */
+  --font-display: var(--font-newsreader), Georgia, 'Times New Roman', serif;
+  --font-ui:
+    var(--font-hanken), -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    sans-serif;
+  --font-mono:
+    var(--font-plex-mono), ui-monospace, 'SFMono-Regular', Menlo, Consolas,
+    monospace;
+
+  /* --- Typography · scale (1.25 ratio · 16–17px base) ------------------ */
+  --fs-display: clamp(44px, 6vw, 72px);
+  --fs-h1: 40px;
+  --fs-h2: 30px;
+  --fs-h3: 21px;
+  --fs-body: 17px;
+  --fs-small: 13px;
+  --fs-label: 11px;
+  --fs-code: 13.5px;
+  --fs-button: 15px;
+
+  --lh-tight: 1.08; /* headings          */
+  --lh-heading: 1.1;
+  --lh-snug: 1.25; /* card title / H3   */
+  --lh-body: 1.6; /* body & code       */
+  --lh-label: 1.4;
+
+  --fw-regular: 400;
+  --fw-medium: 500;
+  --fw-semibold: 600;
+  --fw-bold: 700;
+
+  --tracking-display: -0.015em; /* −1.5% */
+  --tracking-heading: -0.01em; /* −1%   */
+  --tracking-label: 0.14em; /* +14% · uppercase mono labels */
+  --tracking-normal: 0;
+
+  /* --- Spacing (4px base · 8px pulse) ---------------------------------- */
+  --space-1: 4px;
+  --space-2: 8px;
+  --space-3: 12px;
+  --space-4: 16px;
+  --space-5: 20px;
+  --space-6: 24px;
+  --space-8: 32px;
+  --space-10: 40px;
+  --space-12: 48px;
+  --space-16: 64px;
+  --space-20: 80px;
+  --space-24: 96px;
+  --space-30: 120px;
+  --space-40: 160px;
+
+  /* --- Radius ---------------------------------------------------------- */
+  --radius-0: 0; /* datum rules · tables · avatars      */
+  --radius-sm: 2px; /* buttons · inputs · cards · badges   */
+  --radius-md: 4px; /* modals · dropdowns · popovers · img */
+  --radius-lg: 6px; /* tooltips · large surfaces (max)     */
+
+  /* --- Borders --------------------------------------------------------- */
+  --border-hairline: 1px solid var(--hairline);
+  --border-rule: 1.5px solid var(--ink);
+  --border-datum: 2px solid var(--ink);
+  --border-width: 1px;
+  --border-width-rule: 1.5px;
+  --border-width-datum: 2px;
+
+  /* --- Elevation / shadow (E0–E3 depth ladder) ------------------------- */
+  --e0: none; /* flat — default for resting cards */
+  --e1: 0 1px 2px rgba(23, 21, 15, 0.05); /* raised — hover lift */
+  --e2: 0 4px 12px rgba(23, 21, 15, 0.08); /* overlay — dropdowns */
+  --e3: 0 12px 32px rgba(23, 21, 15, 0.12); /* modal — dialogs   */
+  --scrim: rgba(23, 21, 15, 0.4); /* modal backdrop */
+
+  /* --- Opacity --------------------------------------------------------- */
+  --op-disabled: 0.45;
+  --op-muted: 0.65;
+
+  /* --- Motion (Bible §10) ---------------------------------------------- */
+  --dur-instant: 100ms;
+  --dur-micro: 160ms;
+  --dur-standard: 240ms;
+  --dur-entrance: 360ms;
+  --ease: cubic-bezier(0.2, 0.8, 0.2, 1); /* the single default curve */
+
+  /* --- Z-index --------------------------------------------------------- */
+  --z-nav: 100;
+  --z-overlay: 200;
+  --z-modal: 300;
+  --z-toast: 400;
+
+  /* --- Breakpoints (reference values; media queries use px literally) -- */
+  --bp-sm: 640px;
+  --bp-md: 960px;
+  --bp-lg: 1280px;
+
+  /* --- Containers ------------------------------------------------------ */
+  --container: 1200px; /* max content width  */
+  --measure: 680px; /* max reading width  */
+
+  /* --- Focus ring ------------------------------------------------------ */
+  --focus-ring-width: 2px;
+  --focus-ring-offset: 2px;
+  --focus-ring-color: var(--signal);
+}
+
+/*
+ * Dark companion (Blueprint §06). A deliberate second surface — Ink field,
+ * lifted Signal, muted-label raised to #A29C90 to clear AA at small sizes
+ * (defect D-01, risk R-05, closed here at the token layer). Only the values
+ * change; every token name is identical, so no component branches on theme.
+ */
+:root[data-theme='dark'] {
+  --paper: #121110; /* ink field           */
+  --surface: #1b1a18;
+  --sunken: #232220;
+  --hairline: #35332f;
+
+  --ink: #edeae3; /* lifted text         */
+  --graphite: #c4bfb5;
+  --mute: #a29c90; /* R-05 — clears AA    */
+
+  --signal: #5e77ff; /* signal lifted for dark */
+  --signal-tint: #1e2547;
+  --success: #4bb088;
+  --warning: #d69b4c;
+  --danger: #e0695c;
+  --info: #5ba3c4;
+  --neutral-tag: #232220;
+
+  /* Elevation reads slightly stronger on a dark field. */
+  --e1: 0 1px 2px rgba(0, 0, 0, 0.4);
+  --e2: 0 4px 12px rgba(0, 0, 0, 0.5);
+  --e3: 0 12px 32px rgba(0, 0, 0, 0.6);
+  --scrim: rgba(0, 0, 0, 0.6);
+}
