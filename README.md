@@ -78,7 +78,5 @@ pnpm dev                     # http://localhost:3000
 
 Private. All rights reserved.
 
-<!-- deploy check: sample line 1 -->
-<!-- deploy check: sample line 2 -->
-<!-- deploy check: sample line 3 -->
+
 
