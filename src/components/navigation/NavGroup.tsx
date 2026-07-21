@@ -1,4 +1,4 @@
-import { type ReactNode } from 'react';
+import { type ReactNode, useId } from 'react';
 
 import { cn } from '@/lib/cn';
 
@@ -11,9 +11,12 @@ import { cn } from '@/lib/cn';
  * Props:        `title`; ≤ 7 total.
  * Variants:     None.
  * States:       Static container; its NavItem children carry the states.
- * A11y:         Renders a `<nav>` labelled by its heading (aria-labelledby), so
- *               AT announces the group; the heading level is the caller's via
- *               semantics of the title.
+ * A11y:         A titled group of links, NOT its own `<nav>` landmark — the
+ *               footer is already a landmark and each column being a separate
+ *               `<nav>` would flood the AT landmark menu (S15 §02, SC 1.3.1).
+ *               The list is labelled by the visible column title via
+ *               `aria-labelledby`, so AT still announces the group; the caller
+ *               wraps the whole set of columns in one labelled `<nav>`.
  * Responsive:   Column of links; stacks in footer grids.
  * Composition:  Holds NavItem children; used in Footer / SectionNav.
  */
@@ -24,15 +27,20 @@ interface NavGroupProps {
 }
 
 export function NavGroup({ title, children, className }: NavGroupProps) {
+  // A stable, hydration-safe id so the list is programmatically labelled by its
+  // visible title (SC 1.3.1) without adding a redundant landmark.
+  const titleId = useId();
   return (
-    <nav
-      className={cn('flex flex-col gap-3', className)}
-      aria-label={typeof title === 'string' ? title : undefined}
-    >
-      <span className="text-mute text-label font-mono tracking-[0.14em] uppercase">
+    <div className={cn('flex flex-col gap-3', className)}>
+      <span
+        id={titleId}
+        className="text-mute text-label font-mono tracking-[0.14em] uppercase"
+      >
         {title}
       </span>
-      <ul className="flex flex-col gap-2">{children}</ul>
-    </nav>
+      <ul className="flex flex-col gap-2" aria-labelledby={titleId}>
+        {children}
+      </ul>
+    </div>
   );
 }

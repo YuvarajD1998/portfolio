@@ -53,7 +53,7 @@ export function Hero() {
         </Reveal>
         <Reveal delay={0.05}>
           <Stack gap={3} className="mt-10">
-            <Eyebrow as="h2">Positioning</Eyebrow>
+            <Eyebrow as="p">Positioning</Eyebrow>
             <ul
               className="flex flex-wrap gap-2"
               aria-label="Career positioning"

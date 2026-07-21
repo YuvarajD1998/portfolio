@@ -14,6 +14,9 @@ import { cn } from '@/lib/cn';
  * Variants:     None.
  * States:       Static shell; NavItem children carry states.
  * A11y:         Renders the `<footer>` landmark; a top Divider marks the edge.
+ *               The link columns share one `<nav aria-label="Footer">` landmark
+ *               (S15 §02) — each column is a titled group, not its own `<nav>`,
+ *               so the AT landmark menu stays uncluttered (SC 1.3.1).
  * Responsive:   Columns stack on mobile, spread on desktop; meta row wraps.
  * Composition:  `columns` holds NavGroups; `meta` holds the signature row.
  */
@@ -30,9 +33,12 @@ export function Footer({ columns, meta, className }: FooterProps) {
       <Container>
         <div className="flex flex-col gap-10 py-12">
           {columns ? (
-            <div className="flex flex-col gap-10 sm:flex-row sm:flex-wrap sm:gap-16">
+            <nav
+              aria-label="Footer"
+              className="flex flex-col gap-10 sm:flex-row sm:flex-wrap sm:gap-16"
+            >
               {columns}
-            </div>
+            </nav>
           ) : null}
           {meta ? (
             <div className="border-hairline flex flex-wrap items-center justify-between gap-4 border-t pt-6">

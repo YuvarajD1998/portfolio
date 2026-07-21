@@ -68,6 +68,12 @@ export function ContactForm() {
   });
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState<Status>('idle');
+  // A screen-reader-only message routed through the always-mounted live region
+  // below. It exists so state changes not tied to a focus move (invalid submit,
+  // success, failure) are announced reliably (SC 4.1.3). The region is present
+  // and observed from first render — a live region inserted already-populated
+  // is unreliably announced by NVDA/VoiceOver, so we never mount it on demand.
+  const [announcement, setAnnouncement] = useState('');
   const formRef = useRef<HTMLFormElement>(null);
   const statusId = useId();
 
@@ -110,10 +116,14 @@ export function ContactForm() {
     if (Object.keys(nextErrors).length > 0) {
       setErrors(nextErrors);
       setStatus('idle');
+      // Announce that submission was blocked (frozen C3 copy) in addition to
+      // moving focus to the first invalid field (SC 3.3.1, 4.1.3).
+      setAnnouncement(form.states.invalidSummary);
       focusFirstError(nextErrors);
       return;
     }
     setErrors({});
+    setAnnouncement('');
 
     // Honeypot: a filled decoy means a bot — succeed silently without sending.
     const honeypot = (
@@ -154,15 +164,14 @@ export function ContactForm() {
   if (status === 'success') {
     // Success fades in via the shared Fade primitive (S13 §08) — 200ms, and an
     // instant opacity swap under reduced motion (P09 §06 "instant + text"). The
-    // aria-live region announces it regardless of whether motion plays; the
-    // confirmation copy carries the meaning, never the animation.
+    // Alert itself is a `role="status"` (polite) live region (S02 §08), so the
+    // confirmation is announced without a redundant wrapping `aria-live` div —
+    // the copy carries the meaning, never the animation (SC 4.1.3).
     return (
       <Fade>
-        <div aria-live="polite">
-          <Alert status="success" title={form.states.successTitle}>
-            {form.states.success}
-          </Alert>
-        </div>
+        <Alert status="success" title={form.states.successTitle}>
+          {form.states.success}
+        </Alert>
       </Fade>
     );
   }
@@ -224,6 +233,7 @@ export function ContactForm() {
               value={values.subject}
               onChange={(e) => setField('subject')(e.target.value)}
               placeholder={form.fields.subject.placeholder}
+              autoComplete={form.fields.subject.autoComplete}
               disabled={submitting}
             />
           )}
@@ -241,6 +251,7 @@ export function ContactForm() {
               value={values.message}
               onChange={(e) => setField('message')(e.target.value)}
               placeholder={form.fields.message.placeholder}
+              autoComplete={form.fields.message.autoComplete}
               rows={form.fields.message.rows}
               disabled={submitting}
             />
@@ -271,23 +282,31 @@ export function ContactForm() {
           </Button>
         </div>
 
-        {/* Single polite live region — announces loading / failure to AT.
-            (Success is announced by its own region above.) */}
+        {/* Loading is announced in its own polite region; the failure Alert is
+            its own role="alert" (S02 §08), so it announces itself without being
+            nested inside a second live region (which would conflict). */}
         <div aria-live="polite" id={statusId}>
           {submitting ? (
             <p className="text-mute text-small">{form.states.loading}</p>
           ) : null}
-          {status === 'error' ? (
-            <Alert status="error" title={form.states.errorTitle}>
-              {contactForm.isConfigured
-                ? form.states.error
-                : form.states.unavailable}
-              <Link href={form.fallbackEmail.href}>
-                {form.fallbackEmail.label}
-              </Link>
-              {'.'}
-            </Alert>
-          ) : null}
+        </div>
+        {status === 'error' ? (
+          <Alert status="error" title={form.states.errorTitle}>
+            {contactForm.isConfigured
+              ? form.states.error
+              : form.states.unavailable}
+            <Link href={form.fallbackEmail.href}>
+              {form.fallbackEmail.label}
+            </Link>
+            {'.'}
+          </Alert>
+        ) : null}
+
+        {/* Always-mounted, visually-hidden live region. It exists from first
+            render (so AT observes it) and carries the invalid-submit summary
+            (SC 3.3.1, 4.1.3) — the frozen C3 string, never newly authored. */}
+        <div className="sr-only" role="status" aria-live="polite">
+          {announcement}
         </div>
       </Stack>
     </form>

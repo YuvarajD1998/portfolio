@@ -14,7 +14,9 @@ import { cn } from '@/lib/cn';
  * Variants:     None — one diagram treatment.
  * States:       Static.
  * A11y:         Renders as a titled group (`<figure>`+`<figcaption>`); each layer
- *               is a labelled row so the structure reads top-to-bottom in AT.
+ *               is a labelled row whose node chips are a real `<ul>`/`<li>` list
+ *               (S15 §02, SC 1.3.1), so AT announces the layer name, the node
+ *               count and the list boundaries — not a flat run of text.
  * Responsive:   Node chips wrap; the rail stays legible at every width.
  * Composition:  `<ArchitecturePanel>` + one `<ArchitectureLayer>` per tier;
  *               node chips are plain children.
@@ -58,6 +60,7 @@ export function ArchitectureLayer({
   children,
   className,
 }: ArchitectureLayerProps) {
+  const labelId = useId();
   return (
     <div
       className={cn(
@@ -65,10 +68,19 @@ export function ArchitectureLayer({
         className,
       )}
     >
-      <span className="text-mute text-label font-mono tracking-[0.14em] uppercase sm:w-32 sm:shrink-0">
+      <span
+        id={labelId}
+        className="text-mute text-label font-mono tracking-[0.14em] uppercase sm:w-32 sm:shrink-0"
+      >
         {label}
       </span>
-      <div className="flex flex-wrap gap-2">{children}</div>
+      {/* The nodes are a real list labelled by the layer name (SC 1.3.1). */}
+      <ul
+        aria-labelledby={labelId}
+        className="flex list-none flex-wrap gap-2 p-0"
+      >
+        {children}
+      </ul>
     </div>
   );
 }
@@ -83,14 +95,14 @@ export function ArchitectureNode({
   className,
 }: ArchitectureNodeProps) {
   return (
-    <span
+    <li
       className={cn(
         'border-hairline bg-surface text-ink text-small inline-flex items-center rounded-sm border px-3 py-1.5 font-sans',
         className,
       )}
     >
       {children}
-    </span>
+    </li>
   );
 }
 
