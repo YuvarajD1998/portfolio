@@ -51,12 +51,29 @@ export function useActiveSection(ids: string[]): string | undefined {
       },
     );
 
-    const elements = ids
-      .map((id) => document.getElementById(id))
-      .filter((el): el is HTMLElement => el !== null);
-    elements.forEach((el) => observer.observe(el));
+    // On client-side navigation the incoming route's content can mount a frame
+    // later than this effect (the page-transition swap), so getElementById may
+    // return null on the first pass and the observer would attach to nothing —
+    // leaving the rail stuck on ids[0]. Retry on rAF until every section is
+    // present (or the ids change), then observe them once.
+    let frame = 0;
+    const attach = () => {
+      const elements = ids
+        .map((id) => document.getElementById(id))
+        .filter((el): el is HTMLElement => el !== null);
 
-    return () => observer.disconnect();
+      if (elements.length < ids.length) {
+        frame = requestAnimationFrame(attach);
+        return;
+      }
+      elements.forEach((el) => observer.observe(el));
+    };
+    attach();
+
+    return () => {
+      cancelAnimationFrame(frame);
+      observer.disconnect();
+    };
   }, [ids]);
 
   return activeId;
