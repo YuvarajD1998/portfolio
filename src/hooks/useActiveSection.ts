@@ -6,12 +6,18 @@ import { useEffect, useState } from 'react';
  * Track which section is currently in view (Sprint 03 §09, §10).
  *
  * Given an ordered list of element ids, returns the id of the section nearest
- * the top of the viewport (below the sticky header). Uses IntersectionObserver
- * with a top root-margin equal to the header height, so the "active" section is
- * the one you are actually reading, not one hidden under the header.
+ * the top of the viewport (below the sticky header) — the one you are actually
+ * reading, not one hidden under the header.
  *
- * Detection is passive observation — no scrolling is triggered here, so it is
- * inherently reduced-motion safe. Returns the first id until the user scrolls.
+ * Detection is a direct scroll-position measurement rather than an
+ * IntersectionObserver: the active section is recomputed on every scroll and
+ * once after mount. An observer is edge-triggered — it only re-fires when
+ * intersection changes — so on client-side navigation its first callback runs
+ * against mid-transition geometry (the page-transition + Reveal entrance still
+ * settling) and then never re-fires without a scroll, leaving the rail stuck.
+ * Measuring positions directly is deterministic and behaves identically on a
+ * fresh load and on navigation. No scrolling is triggered here, so it stays
+ * reduced-motion safe. Returns the first id until the reader scrolls.
  */
 export function useActiveSection(ids: string[]): string | undefined {
   const [activeId, setActiveId] = useState<string | undefined>(ids[0]);
@@ -19,60 +25,57 @@ export function useActiveSection(ids: string[]): string | undefined {
   useEffect(() => {
     if (ids.length === 0) return;
 
-    const visible = new Map<string, number>();
-
-    // IntersectionObserver rootMargin needs px/% literals — resolve the header
-    // height token to px (fallback 64px = the h-16 header) once, up front.
-    const headerPx =
-      parseFloat(
-        getComputedStyle(document.documentElement).getPropertyValue(
-          '--header-height',
-        ),
-      ) * 16 || 64;
-
-    const observer = new IntersectionObserver(
-      (entries) => {
-        for (const entry of entries) {
-          if (entry.isIntersecting) {
-            visible.set(entry.target.id, entry.intersectionRatio);
-          } else {
-            visible.delete(entry.target.id);
-          }
-        }
-        // Pick the visible section that comes first in document order.
-        const firstVisible = ids.find((id) => visible.has(id));
-        if (firstVisible) setActiveId(firstVisible);
-      },
-      {
-        // Offset the top by the header so a section counts as active once it
-        // clears the bar; a bottom margin keeps one section selected.
-        rootMargin: `-${headerPx}px 0px -55% 0px`,
-        threshold: [0, 0.25, 0.5, 1],
-      },
+    // Resolve the sticky-header height once so a section counts as "current"
+    // the moment it clears the bar. --header-height is a rem value; convert to
+    // px against the root font size (fallback 64px = the h-16 header).
+    const rootFontPx =
+      parseFloat(getComputedStyle(document.documentElement).fontSize) || 16;
+    const headerRem = parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue(
+        '--header-height',
+      ),
     );
+    const headerPx = Number.isFinite(headerRem) ? headerRem * rootFontPx : 64;
 
-    // On client-side navigation the incoming route's content can mount a frame
-    // later than this effect (the page-transition swap), so getElementById may
-    // return null on the first pass and the observer would attach to nothing —
-    // leaving the rail stuck on ids[0]. Retry on rAF until every section is
-    // present (or the ids change), then observe them once.
-    let frame = 0;
-    const attach = () => {
-      const elements = ids
-        .map((id) => document.getElementById(id))
-        .filter((el): el is HTMLElement => el !== null);
+    // The line below the header where "current" is measured; a small extra
+    // offset means a section activates just as its heading reaches the bar.
+    const activationLine = headerPx + 8;
 
-      if (elements.length < ids.length) {
-        frame = requestAnimationFrame(attach);
-        return;
+    const computeActive = () => {
+      // The active section is the last one whose top has scrolled above the
+      // activation line — i.e. the one currently under the reader's eye.
+      let current = ids[0];
+      for (const id of ids) {
+        const el = document.getElementById(id);
+        if (!el) continue;
+        if (el.getBoundingClientRect().top <= activationLine) {
+          current = id;
+        } else {
+          break;
+        }
       }
-      elements.forEach((el) => observer.observe(el));
+      setActiveId(current);
     };
-    attach();
+
+    // Recompute on scroll and on resize (section offsets move when the layout
+    // reflows). Passive listener — never blocks scrolling.
+    const onScroll = () => computeActive();
+    window.addEventListener('scroll', onScroll, { passive: true });
+    window.addEventListener('resize', onScroll);
+
+    // Evaluate once after the incoming route has settled. On navigation the
+    // page-transition + Reveal entrance animate for a couple of frames after
+    // mount, so a single synchronous read would measure mid-animation offsets;
+    // a double rAF lets layout settle before the first measurement.
+    let frame = 0;
+    frame = requestAnimationFrame(() => {
+      frame = requestAnimationFrame(computeActive);
+    });
 
     return () => {
       cancelAnimationFrame(frame);
-      observer.disconnect();
+      window.removeEventListener('scroll', onScroll);
+      window.removeEventListener('resize', onScroll);
     };
   }, [ids]);
 
