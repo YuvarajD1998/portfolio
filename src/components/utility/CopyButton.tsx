@@ -1,7 +1,7 @@
 'use client';
 
 import { Check, Copy } from 'lucide-react';
-import { useCallback, useState } from 'react';
+import { useCallback, useEffect, useRef, useState } from 'react';
 
 import { IconButton } from '@/components/ui';
 
@@ -34,12 +34,23 @@ export function CopyButton({
   size = 'sm',
 }: CopyButtonProps) {
   const [copied, setCopied] = useState(false);
+  // Track the reset timer so it is cancelled on unmount — no state update on an
+  // unmounted component, nothing left pending (S16 §12).
+  const resetTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  useEffect(
+    () => () => {
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+    },
+    [],
+  );
 
   const onCopy = useCallback(async () => {
     try {
       await navigator.clipboard.writeText(value);
       setCopied(true);
-      window.setTimeout(() => setCopied(false), 1500);
+      if (resetTimer.current) clearTimeout(resetTimer.current);
+      resetTimer.current = setTimeout(() => setCopied(false), 1500);
     } catch {
       // Clipboard unavailable (insecure context / denied) — no-op, no throw.
     }

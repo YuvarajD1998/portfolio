@@ -4,6 +4,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest';
 
 import { contactForm } from '@/config/contact-form';
 import { form } from '@/content/contact';
+import { axe } from '@/tests/axe';
 
 import { ContactForm } from './ContactForm';
 
@@ -78,6 +79,16 @@ describe('ContactForm — validation (§06)', () => {
     render(<ContactForm />);
     await user.click(screen.getByRole('button', { name: form.submit }));
     expect(screen.getByLabelText(/name/i)).toHaveFocus();
+  });
+
+  it('announces the frozen invalid-submit summary through a live region (S15 §07, SC 3.3.1/4.1.3)', async () => {
+    const user = userEvent.setup();
+    render(<ContactForm />);
+    await user.click(screen.getByRole('button', { name: form.submit }));
+    // The summary is the frozen C3 string, surfaced through a role="status"
+    // live region that is mounted from first render (so AT observes it).
+    const status = await screen.findByText(form.states.invalidSummary);
+    expect(status).toBeInTheDocument();
   });
 
   it('rejects a malformed email with the frozen format error', async () => {
@@ -177,5 +188,21 @@ describe('ContactForm — delivery states (§06)', () => {
     expect(await screen.findByRole('status')).toHaveTextContent(
       form.states.success,
     );
+  });
+});
+
+describe('ContactForm — automated a11y (S15 §14, gate G2)', () => {
+  it('has no axe violations in its idle state', async () => {
+    const { container } = render(<ContactForm />);
+    expect(await axe(container)).toHaveNoViolations();
+  });
+
+  it('has no axe violations after an invalid submit surfaces field errors', async () => {
+    const user = userEvent.setup();
+    const { container } = render(<ContactForm />);
+    await user.click(screen.getByRole('button', { name: form.submit }));
+    // Errors are now shown, tied via aria-describedby + aria-invalid, and the
+    // live-region summary is present — the whole error state must stay clean.
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

@@ -10,6 +10,7 @@ import {
   philosophy,
   stateManagement,
 } from '@/content/engineering';
+import { axe } from '@/tests/axe';
 
 import EngineeringPage from './page';
 
@@ -185,5 +186,10 @@ describe('EngineeringPage', () => {
     ).toBeNull();
     // No invented coverage/performance percentage sneaks into the copy.
     expect(screen.queryByText(/\d+%\s*(coverage|faster|smaller)/i)).toBeNull();
+  });
+
+  it('has no axe violations across the full page (S15 §14, gate G2)', async () => {
+    const { container } = render(<EngineeringPage />);
+    expect(await axe(container)).toHaveNoViolations();
   });
 });

@@ -27,6 +27,19 @@ const KNOWN_SLUGS: Record<string, { title: string; description: string }> = {
   // Reserved for future case studies; populated in a later sprint.
 };
 
+/**
+ * Prerender the known slugs at build time and 404 anything else statically
+ * (S16 §09). The content is frozen, so the set is closed — there is no genuine
+ * need for on-demand rendering. `dynamicParams = false` turns any unknown slug
+ * into the segment's not-found page at the edge, without a server render, so
+ * the whole route is served as static HTML like every other page.
+ */
+export function generateStaticParams(): Array<{ slug: string }> {
+  return Object.keys(KNOWN_SLUGS).map((slug) => ({ slug }));
+}
+
+export const dynamicParams = false;
+
 type Params = { slug: string };
 
 export async function generateMetadata({

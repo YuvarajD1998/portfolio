@@ -100,6 +100,7 @@ Safari (WebKit) macOS+iOS · Edge (Blink); NVDA+FF/Chrome; VoiceOver+Safari.
 
 ## Deliverable: Accessibility Compliance Report (§15)
 
+**Produced:** [`docs/accessibility-compliance-report.md`](./accessibility-compliance-report.md).
 Lives with the design system (S02), beside the S14 responsive docs. Records:
 WCAG 2.2 AA checklist (criterion → status → evidence), components audited (S02
 inventory), issues identified, resolutions implemented, remaining known
@@ -109,19 +110,34 @@ decision back to a success criterion and an approved phase.
 
 ## What this sprint changed
 
-Fixes are accessibility-only and confined to defects the audits surfaced —
-each traceable to a WCAG SC and made inside the existing design system:
+Fixes are accessibility-only and confined to the six defects the audits
+surfaced — each traceable to a WCAG SC and made inside the existing design
+system. The full record is in
+[`accessibility-compliance-report.md`](./accessibility-compliance-report.md) §2:
 
-- Missing/incorrect accessible names on icon-only controls → named (native
-  `aria-label` on the S02 primitive, applied once).
-- Any heading whose **level** (not text) was wrong for the outline → level
-  corrected; visual size stays a token.
-- Any repeated landmark without a disambiguating name → named.
-- Diagram/chart text alternatives wired from frozen Book B content (A1).
-- Form error/success wiring verified and completed on the S02 `Field` (S12).
-- Automated a11y assertions extended where a page/widget lacked one.
-- Contrast measured across both themes; any palette failure raised (A2), not
-  repainted.
+1. **Footer landmark proliferation** → `NavGroup` no longer renders a `<nav>`
+   per column; one `<nav aria-label="Footer">` wraps all columns; each column
+   is a `<ul>` labelled by its title (SC 1.3.1).
+2. **Bogus `<h2>` in the outline** → the decorative eyebrow micro-labels on
+   four heroes moved from `as="h2"` to `as="p"`; text unchanged (SC 1.3.1,
+   2.4.6).
+3. **Invalid-submit not announced** → the *frozen* `invalidSummary` string is
+   now surfaced through an always-mounted `role="status"` live region, in
+   addition to focus-to-first-error (SC 3.3.1, 4.1.3).
+4. **Fragile Contact success/error announcement** → removed the redundant
+   wrapping `aria-live` divs; the S02 `Alert` (already `role="status"`/`alert`)
+   announces once, reliably (SC 4.1.3).
+5. **Missing `autocomplete`** → applied to the subject/message inputs from the
+   content config (SC 1.3.5).
+6. **Diagram not machine-structured** → `ArchitecturePanel` node chips are now
+   a real `<ul>`/`<li>` list labelled by the layer name (SC 1.1.1, 1.3.1).
+
+Also: `axe-core` (WCAG 2.2 AA rule set) was wired into the Vitest suite via
+`vitest-axe` (`src/tests/axe.ts` + `src/tests/setup.ts`) — the automated **gate
+G2** the record had assumed but that was not yet present — with co-located
+assertions on the Contact form, footer, diagram and Engineering page. Contrast
+is measured against the token values in `src/utils/a11y.test.ts` (both themes).
+Test count 240 → 253.
 
 **No route, layout, section, content string, typography scale, colour token or
 S13 animation was altered. S03–S14 remain frozen.**

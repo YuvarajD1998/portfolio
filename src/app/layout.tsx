@@ -1,5 +1,6 @@
 import { type Metadata, type Viewport } from 'next';
 
+import { WebVitals } from '@/components/utility';
 import { AppShell } from '@/layouts/AppShell';
 import { defaultMetadata } from '@/lib/seo';
 import { personJsonLd, serializeJsonLd } from '@/lib/structured-data';
@@ -49,6 +50,7 @@ export default function RootLayout({
         />
       </head>
       <body>
+        <WebVitals />
         <Providers>
           <AppShell>{children}</AppShell>
         </Providers>

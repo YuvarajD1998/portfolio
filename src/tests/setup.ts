@@ -1,7 +1,15 @@
 import '@testing-library/jest-dom/vitest';
 
 import { cleanup } from '@testing-library/react';
-import { afterEach, vi } from 'vitest';
+import { afterEach, expect, vi } from 'vitest';
+// axe-core matcher (`toHaveNoViolations`) for the automated a11y gate G2
+// (Sprint 15 §14). Registered explicitly — vitest-axe 0.1.0 ships an empty
+// `extend-expect` entry, so we wire the matcher ourselves. Co-located a11y
+// assertions call `axe()` from `@/tests/axe` and assert against this matcher,
+// so a structural WCAG regression fails the suite on every merge.
+import * as axeMatchers from 'vitest-axe/matchers';
+
+expect.extend(axeMatchers);
 
 /**
  * Global test setup (Sprint 01 §11).

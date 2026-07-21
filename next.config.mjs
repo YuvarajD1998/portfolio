@@ -28,11 +28,12 @@ const nextConfig = {
   experimental: {
     // Rewrite barrel imports to per-module paths so only the icons/primitives
     // actually used are bundled — keeps the client boundary lean (S16 §03).
-    // lucide-react is optimised by Next's defaults; the Radix packages and the
-    // motion library are named explicitly so their tree-shaking is guaranteed.
+    // lucide-react is optimised by Next's defaults; the Radix packages are named
+    // explicitly so their tree-shaking is guaranteed. `motion` is deliberately
+    // NOT listed — barrel-rewriting it breaks its `useId` re-export and fails
+    // the /showcase prerender, so its own ESM tree-shaking is trusted instead.
     optimizePackageImports: [
       'lucide-react',
-      'motion',
       '@radix-ui/react-dialog',
       '@radix-ui/react-dropdown-menu',
       '@radix-ui/react-popover',

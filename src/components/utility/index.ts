@@ -13,3 +13,4 @@ export { Show, Hide, type ResponsiveBreakpoint } from './Responsive';
 export { ScrollToTop } from './ScrollToTop';
 export { ScrollIndicator } from './ScrollIndicator';
 export { FutureContent } from './FutureContent';
+export { WebVitals } from './WebVitals';
