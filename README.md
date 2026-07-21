@@ -76,6 +76,7 @@ pnpm dev                     # http://localhost:3000
 
 ## License
 
+
 Private. All rights reserved.
 
 
