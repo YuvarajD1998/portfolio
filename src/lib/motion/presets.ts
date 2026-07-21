@@ -1,6 +1,6 @@
 import { type Variants } from 'motion/react';
 
-import { duration, easing } from '@/theme/tokens';
+import { duration, easing, staggerStep } from '@/theme/tokens';
 
 /**
  * Reusable motion presets (Sprint 01 §08, Blueprint §12, Bible §10).
@@ -25,13 +25,16 @@ export const fade: Variants = {
   },
 };
 
-/** 12px rise + fade — the section-reveal signature (Bible §10). */
+/**
+ * 12px rise + fade — the section-reveal signature (Bible §10).
+ * 400ms "directs first read", confirmed in P09 §06.
+ */
 export const slideUp: Variants = {
   hidden: { opacity: 0, y: 12 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: duration.entrance, ease },
+    transition: { duration: duration.reveal, ease },
   },
 };
 
@@ -55,17 +58,21 @@ export const reveal = slideUp;
 export const stagger: Variants = {
   hidden: {},
   visible: {
-    transition: { staggerChildren: 0.05, delayChildren: 0.05 },
+    transition: { staggerChildren: staggerStep, delayChildren: staggerStep },
   },
 };
 
-/** Page cross-fade with a slight rise (Bible §10). */
+/**
+ * Page cross-fade with a slight rise (Bible §10) — "confirms you moved".
+ * 200ms enter / faster exit, confirmed in P09 §06. Never gates navigation:
+ * the route mounts immediately and this plays over the top (§05 RULE).
+ */
 export const pageTransition: Variants = {
   hidden: { opacity: 0, y: 8 },
   visible: {
     opacity: 1,
     y: 0,
-    transition: { duration: duration.standard, ease },
+    transition: { duration: duration.page, ease },
   },
   exit: {
     opacity: 0,
@@ -78,6 +85,36 @@ export const pageTransition: Variants = {
 export const hoverNudge: Variants = {
   rest: { y: 0 },
   hover: { y: -2, transition: { duration: duration.instant, ease } },
+};
+
+/**
+ * Homepage hero: the thesis rises word-by-word (P03 §00 motion), the datum
+ * line draws underneath. Kept here — not inline in Hero — so the hero uses the
+ * shared tokens and easing, never hard-coded numbers (§02/§03 RULE).
+ */
+export const heroWordContainer: Variants = {
+  hidden: {},
+  visible: {
+    transition: { staggerChildren: 0.04, delayChildren: duration.entrance },
+  },
+};
+
+export const heroWord: Variants = {
+  hidden: { opacity: 0, y: '0.4em' },
+  visible: {
+    opacity: 1,
+    y: '0em',
+    transition: { duration: duration.reveal, ease },
+  },
+};
+
+/** Decorative datum line that draws on load (scaleY 0 → 1). */
+export const heroDatumLine: Variants = {
+  hidden: { scaleY: 0 },
+  visible: {
+    scaleY: 1,
+    transition: { duration: duration.entrance, ease },
+  },
 };
 
 /**
@@ -97,6 +134,9 @@ export const motionPresets = {
   stagger,
   pageTransition,
   hoverNudge,
+  heroWordContainer,
+  heroWord,
+  heroDatumLine,
   reducedMotion,
 } as const;
 

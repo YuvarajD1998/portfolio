@@ -1,4 +1,4 @@
-import { type SpaceStep } from '@/components/primitives/Stack';
+import { type SpaceStep } from '@/components/layout/Stack';
 
 /**
  * Spacer — explicit whitespace on the spacing scale (Bible §06).

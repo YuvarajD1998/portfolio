@@ -67,9 +67,9 @@ const eslintConfig = [
     },
   },
   {
-    // Architecture import boundaries (Blueprint §03): primitives never reach up
+    // Architecture import boundaries (Blueprint §03): components never reach up
     // into features or app; the token/util layers stay leaf-level.
-    files: ['src/components/primitives/**/*.{ts,tsx}'],
+    files: ['src/components/**/*.{ts,tsx}'],
     rules: {
       'no-restricted-imports': [
         'error',

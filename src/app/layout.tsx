@@ -10,11 +10,12 @@ import { themeScript } from '@/theme/theme-script';
 import '@/styles/globals.css';
 
 /**
- * Root layout — the application shell (Sprint 01 §06).
+ * Root layout — the layer under everything (Sprint 03 §03).
  *
- * Wires the fonts, the pre-hydration theme script (FOUC prevention, R-04),
- * global providers, the app shell and the shared Person JSON-LD. It builds the
- * frame every future page mounts into and renders no portfolio page itself.
+ * Wires the fonts (zero layout shift), the pre-hydration theme script (no FOUC),
+ * global providers, the application shell and the shared Person JSON-LD. It is
+ * the frame every route mounts into and renders no page content itself; per-route
+ * `metadata`/`generateMetadata` override the defaults set here.
  */
 
 export const metadata: Metadata = defaultMetadata;

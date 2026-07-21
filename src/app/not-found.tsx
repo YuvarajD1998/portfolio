@@ -1,11 +1,4 @@
-import {
-  Container,
-  Heading,
-  Link,
-  Section,
-  Stack,
-  Text,
-} from '@/components/primitives';
+import { Container, Heading, Link, Section, Stack, Text } from '@/components';
 
 /**
  * 404 — branded not-found placeholder (Sprint 01 §06, Blueprint §09).

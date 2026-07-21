@@ -1,4 +1,4 @@
-import { Container, Section, Stack } from '@/components/primitives';
+import { Container, Section, Stack } from '@/components';
 
 /**
  * Loading placeholder (Sprint 01 §06).

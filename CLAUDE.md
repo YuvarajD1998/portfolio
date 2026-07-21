@@ -19,12 +19,24 @@ responsibility (Sprint 01 §03).
 
 ```
 src/
-├─ app/          Routes, layouts, route-level metadata (App Router).
-├─ components/   Reusable, generic UI.
-│  ├─ primitives/  Layout & text primitives (Container, Text, …).
-│  └─ icon/        The single Icon wrapper.
+├─ app/          Routes, layouts, route-level metadata (App Router). See ROUTING.md.
+├─ components/   Reusable, generic UI — the design system (Sprint 02 §03).
+│  ├─ ui/           Core interactive primitives (Button, IconButton).
+│  ├─ layout/       Structural primitives (Container, Grid, Stack, …).
+│  ├─ typography/   The type scale as components (Heading, Text, …).
+│  ├─ navigation/   Header, NavBar, Breadcrumb, MobileNav, … (wired in S03).
+│  ├─ feedback/     Alert, Toast, Skeleton, Progress, state panels.
+│  ├─ forms/        Inputs, Select, Checkbox, Field wrapper (a11y-wired).
+│  ├─ data-display/ Card, Surface, Badge, Avatar, Metric, Timeline, …
+│  ├─ overlays/     Dialog, Drawer, Popover, Tooltip, Menus (Radix-based).
+│  ├─ icons/        The single Icon wrapper + sizing scale.
+│  ├─ utility/      Theme toggle, copy, scroll, skip-nav, responsive show/hide.
+│  ├─ motion/       Reusable motion wrappers on the S01 presets.
+│  └─ index.ts      Tree-shakeable barrel — named exports only.
 ├─ features/     Page- & domain-specific composed UI. (empty until S04+)
-├─ layouts/      Structural wrappers & region composition (Header, Footer, shell).
+├─ templates/    Reusable page templates a route extends (S03 §08).
+├─ layouts/      Shell composition & region wiring (AppShell, Site{Header,Footer},
+│                RouteAnnouncer, RouteError, BreadcrumbTrail, SectionRail).
 ├─ lib/          Framework-adjacent helpers & integrations (cn, seo, motion).
 ├─ hooks/        Reusable React hooks.
 ├─ providers/    Context providers (theme, …).
@@ -70,8 +82,8 @@ src/
 
 No component is merged until its JSDoc header declares all eight:
 **Purpose · Public API · Props · Variants · States · Accessibility ·
-Responsive · Composition.** Every primitive in `components/primitives/` follows
-this template — copy it.
+Responsive · Composition.** Every component under `components/` follows this
+template — copy it.
 
 ### Conventions (Blueprint §04, §17)
 

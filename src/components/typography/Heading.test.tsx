@@ -1,7 +1,7 @@
 import { render, screen } from '@testing-library/react';
 import { describe, expect, it } from 'vitest';
 
-import { Heading } from '@/components/primitives';
+import { Heading } from '@/components/typography';
 
 describe('Heading', () => {
   it('renders the semantic level from `as`, independent of visual size', () => {

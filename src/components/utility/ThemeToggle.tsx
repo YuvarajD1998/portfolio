@@ -2,7 +2,7 @@
 
 import { Moon, Sun } from 'lucide-react';
 
-import { Icon } from '@/components/icon';
+import { Icon } from '@/components/icons';
 import { cn } from '@/lib/cn';
 import { useTheme } from '@/providers/theme-provider';
 

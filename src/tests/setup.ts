@@ -10,6 +10,12 @@ import { afterEach, vi } from 'vitest';
  * - Unmount React trees between tests.
  * - matchMedia is stubbed because jsdom omits it; theme + reduced-motion
  *   code reads it, so tests would otherwise throw.
+ * - IntersectionObserver is stubbed because jsdom omits it; the motion
+ *   primitives (`whileInView` reveals, S13 §06) construct one on mount, and it
+ *   drives `useActiveSection` scroll-spy — tests would otherwise throw. The
+ *   stub reports the element as immediately in view so revealed content is
+ *   present and assertable (reveals are progressive enhancement — content
+ *   exists regardless of the observer, S13 §06).
  */
 afterEach(() => {
   cleanup();
@@ -26,4 +32,28 @@ if (!window.matchMedia) {
     removeListener: vi.fn(),
     dispatchEvent: vi.fn(),
   }));
+}
+
+if (typeof window.IntersectionObserver === 'undefined') {
+  class MockIntersectionObserver implements IntersectionObserver {
+    readonly root: Element | Document | null = null;
+    readonly rootMargin: string = '';
+    readonly thresholds: ReadonlyArray<number> = [];
+    constructor(private readonly callback: IntersectionObserverCallback) {}
+    // Report the target as intersecting immediately, so `whileInView` reveals
+    // resolve to their visible state in tests (content is present regardless).
+    observe = (target: Element): void => {
+      this.callback(
+        [{ isIntersecting: true, target } as IntersectionObserverEntry],
+        this,
+      );
+    };
+    unobserve = (): void => {};
+    disconnect = (): void => {};
+    takeRecords = (): IntersectionObserverEntry[] => [];
+  }
+  window.IntersectionObserver =
+    MockIntersectionObserver as unknown as typeof IntersectionObserver;
+  globalThis.IntersectionObserver =
+    MockIntersectionObserver as unknown as typeof IntersectionObserver;
 }

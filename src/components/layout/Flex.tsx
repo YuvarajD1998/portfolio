@@ -1,6 +1,6 @@
 import { type ElementType } from 'react';
 
-import { GAP, type SpaceStep } from '@/components/primitives/Stack';
+import { GAP, type SpaceStep } from '@/components/layout/Stack';
 import { cn } from '@/lib/cn';
 import { type PolymorphicProps } from '@/types/polymorphic';
 

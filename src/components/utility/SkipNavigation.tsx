@@ -1,14 +1,31 @@
 /**
- * SkipLink — first tab stop, jumps to main content (Bible §11).
+ * SkipNavigation — first tab stop, jumps to main content (Bible §11, S02 §09).
  *
- * Visually hidden until focused (see `.skip-link` in globals.css), then it
- * appears at the top-left. Targets the `#main-content` landmark the layout
- * renders. A required part of the a11y baseline every page inherits.
+ * Purpose:      The skip link that lets keyboard users bypass the header and
+ *               land on the main content — the a11y baseline every page inherits.
+ * Public API:   `targetId`, `children`.
+ * Props:        `targetId`, `children`; ≤ 7 total.
+ * Variants:     None.
+ * States:       visually hidden until focused, then appears top-left (see
+ *               `.skip-link` in globals.css).
+ * A11y:         A real anchor to the `#main-content` landmark; it is (and must
+ *               remain) the first focusable element on the page.
+ * Responsive:   Fixed position when focused; size-agnostic.
+ * Composition:  Mounts at the very top of the app shell, before the header.
  */
-export function SkipLink() {
+interface SkipNavigationProps {
+  /** Landmark id to jump to. Default `main-content`. */
+  targetId?: string;
+  children?: React.ReactNode;
+}
+
+export function SkipNavigation({
+  targetId = 'main-content',
+  children = 'Skip to content',
+}: SkipNavigationProps) {
   return (
-    <a href="#main-content" className="skip-link">
-      Skip to content
+    <a href={`#${targetId}`} className="skip-link">
+      {children}
     </a>
   );
 }

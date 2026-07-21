@@ -1,21 +1,22 @@
 import { type MetadataRoute } from 'next';
 
-import { siteConfig } from '@/config/site';
+import { allRoutePaths } from '@/config/navigation';
+import { absoluteUrl } from '@/lib/seo';
 
 /**
- * sitemap.xml — placeholder (Sprint 01 §09).
+ * sitemap.xml (Sprint 03 §02).
  *
- * Sprint 01 ships no portfolio pages, so the sitemap lists only the root. As
- * pages land, each sprint adds its routes here (and dynamic project slugs are
- * generated from content). The machinery is in place; the entries are not yet.
+ * Generated from the single route model (`config/navigation`), so every route
+ * that exists is listed and a new route appears here automatically. Dynamic
+ * `/projects/[slug]` studies are added by a later sprint when their content
+ * (and slugs) land. Home gets top priority; the rest inherit a sensible default.
  */
 export default function sitemap(): MetadataRoute.Sitemap {
-  return [
-    {
-      url: siteConfig.url,
-      lastModified: new Date(),
-      changeFrequency: 'monthly',
-      priority: 1,
-    },
-  ];
+  const lastModified = new Date();
+  return allRoutePaths.map((path) => ({
+    url: absoluteUrl(path),
+    lastModified,
+    changeFrequency: 'monthly',
+    priority: path === '/' ? 1 : 0.7,
+  }));
 }

@@ -30,9 +30,13 @@ export const token = {
   // Motion
   durInstant: 'var(--dur-instant)',
   durMicro: 'var(--dur-micro)',
+  durPage: 'var(--dur-page)',
   durStandard: 'var(--dur-standard)',
   durEntrance: 'var(--dur-entrance)',
+  durReveal: 'var(--dur-reveal)',
   ease: 'var(--ease)',
+  easeEnter: 'var(--ease-enter)',
+  easeExit: 'var(--ease-exit)',
 } as const;
 
 /**
@@ -44,9 +48,14 @@ export const token = {
 export const duration = {
   instant: 0.1,
   micro: 0.16,
+  page: 0.2, // page transition (P09 §06)
   standard: 0.24,
   entrance: 0.36,
+  reveal: 0.4, // section reveal (P09 §06)
 } as const;
+
+/** Stagger step for sequenced content, in seconds (Bible §10; M1 default). */
+export const staggerStep = 0.05;
 
 /** The single default easing curve as a cubic-bezier array (Bible §10). */
 export const easing = [0.2, 0.8, 0.2, 1] as const;

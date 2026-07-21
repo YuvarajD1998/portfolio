@@ -88,6 +88,9 @@
   --container-datum: var(--container);
   --container-measure: var(--measure);
 
+  /* Sticky-header height — spacing token so `scroll-mt-header` clears it. */
+  --spacing-header: var(--header-height);
+
   /* Named breakpoints (Bible §05). Tailwind reads these for sm:/md:/lg:. */
   --breakpoint-sm: 640px;
   --breakpoint-md: 960px;
@@ -120,6 +123,8 @@
     -moz-osx-font-smoothing: grayscale;
     text-rendering: optimizeLegibility;
     scroll-behavior: smooth;
+    /* Anchored jumps land below the sticky header, never under it (S03 §10). */
+    scroll-padding-top: var(--header-height);
   }
 
   body {
@@ -284,6 +289,68 @@
 
   .skip-link:focus {
     transform: translateY(0);
+  }
+}
+
+/*
+ * --- Overlay motion (Bible §10) ------------------------------------------
+ * Radix overlays expose `data-state="open|closed"`. We animate transform +
+ * opacity only (60fps), on the standard curve. Reduced-motion collapses these
+ * to instant via the global rule below. No external animation plugin needed.
+ */
+@layer utilities {
+  @keyframes datum-fade-in {
+    from {
+      opacity: 0;
+    }
+    to {
+      opacity: 1;
+    }
+  }
+
+  @keyframes datum-scale-in {
+    from {
+      opacity: 0;
+      transform: translate(-50%, -50%) scale(0.97);
+    }
+    to {
+      opacity: 1;
+      transform: translate(-50%, -50%) scale(1);
+    }
+  }
+
+  @keyframes datum-slide-in-right {
+    from {
+      transform: translateX(100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  @keyframes datum-slide-in-left {
+    from {
+      transform: translateX(-100%);
+    }
+    to {
+      transform: translateX(0);
+    }
+  }
+
+  .datum-overlay-in[data-state='open'] {
+    animation: datum-fade-in var(--dur-micro) var(--ease);
+  }
+  .datum-dialog-in[data-state='open'] {
+    animation: datum-scale-in var(--dur-standard) var(--ease);
+  }
+  .datum-drawer-right[data-state='open'] {
+    animation: datum-slide-in-right var(--dur-standard) var(--ease);
+  }
+  .datum-drawer-left[data-state='open'] {
+    animation: datum-slide-in-left var(--dur-standard) var(--ease);
+  }
+  .datum-popover-in[data-state='open'] {
+    animation: datum-fade-in var(--dur-micro) var(--ease);
   }
 }
 
